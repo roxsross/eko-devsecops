@@ -1,0 +1,21 @@
+#by @roxsross
+#EkoParty Hackademy
+#cam4
+
+name: Pipeline DevSecOps EkoParty Hackademy
+
+on:     
+  push:
+    branches:   
+      - master
+
+  workflow_dispatch:
+
+
+jobs:
+
+  init:
+    name: Install dependencies
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3        
