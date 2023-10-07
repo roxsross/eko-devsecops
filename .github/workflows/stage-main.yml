@@ -53,7 +53,12 @@ jobs:
       secrets:
         TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
         TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+
   security_dast:
       name: Deploy
       needs: deploy_to_aws
       uses: ./.github/workflows/stage-dast.yml   
+      secrets:
+        FARADAY_HOST: ${{ secrets.FARADAY_HOST }}
+        FARADAY_USER: ${{ secrets.FARADAY_USER }}
+        FARADAY_PASS: ${{ secrets.FARADAY_PASS }}      

@@ -48,19 +48,23 @@ jobs:
     - name: Generate BOM
       uses: CycloneDX/gh-node-module-generatebom@v1
       with:
-        output: './bom.xml'       
+        output: './bom.xml'  
+    - uses: actions/upload-artifact@v3
+      with:
+          name: bom
+          path: bom.xml              
     - name: 'Upload DEPENDENCY_TRACK'
       env:
          KEY: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
          HOST: ${{ secrets.DEPENDENCYTRACK_HOST }}
       run: |
-          VERSION=`jq -r '.version' ./package.json`
-          BOM=`cat bom.xml|base64`
-          echo "{ \"projectName\": \"$REPO_NAME\",\"projectVersion\": \"$VERSION\", \"autoCreate\": \"true\", \"bom\": \"$BOM\" }" >bom-payload.json
-          curl -s -X "PUT" "$HOST" \
-              -H "Content-Type: application/json" \
-              -H "X-API-Key: $KEY" \
-              -d @bom-payload.json            
+        VERSION=`jq -r '.version' ./package.json`
+        BOM=`cat bom.xml|base64`
+        echo "{ \"projectName\": \"$REPO_NAME\",\"projectVersion\": \"$VERSION\", \"autoCreate\": \"true\", \"bom\": \"$BOM\" }" >bom-payload.json
+        curl -s -X "PUT" "$HOST" \
+            -H "Content-Type: application/json" \
+            -H "X-API-Key: $KEY" \
+            -d @bom-payload.json            
 
   check-trivy:
     name: check-trivy
