@@ -8,6 +8,9 @@ on:
         DEPENDENCYTRACK_HOST:
           required: true  
 
+env:
+  REPO_NAME: ${{ github.event.repository.name }}  
+
 jobs:
 
   check-secret:
@@ -49,9 +52,36 @@ jobs:
           VERSION=`jq -r '.version' ./package.json`
           BOM=`cat bom.xml|base64`
           echo "{ \"projectName\": \"$REPO_NAME\",\"projectVersion\": \"$VERSION\", \"autoCreate\": \"true\", \"bom\": \"$BOM\" }" >bom-payload.json
-          cat @bom-payload.json
-
           curl -X "PUT" "$HOST" \
               -H "Content-Type: application/json" \
               -H "X-API-Key: $KEY" \
               -d @bom-payload.json            
+
+  check-trivy:
+    name: check-trivy
+    runs-on: ubuntu-latest  
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+      - name: Build an image from Dockerfile
+        run: |
+          docker build -t trivy-image:${{ github.sha }} .
+      - name: Run Trivy vulnerability scanner
+        uses: aquasecurity/trivy-action@master
+        continue-on-error: true
+        with:
+          image-ref: 'trivy-image:${{ github.sha }}'
+          format: 'json'
+          output: 'trivy-results.json'
+          severity: 'HIGH'
+          exit-code: '1'
+      - uses: actions/upload-artifact@v3
+        with:
+          name: trivy
+          path: trivy-results.json 
+      - name: upload faraday
+        run: |
+          pip install faraday-cli
+          faraday-cli auth -f ${{ secrets.FARADAY_HOST }} -u ${{ secrets.FARADAY_USER}} -p "${{ secrets.FARADAY_PASS }}"
+          faraday-cli workspace create ${{ github.event.repository.name}}-${{ github.run_number}}
+          faraday-cli tool report -w ${{ github.event.repository.name}}-${{ github.run_number}} trivy-results.json                
