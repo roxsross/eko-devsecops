@@ -10,12 +10,38 @@ on:
       - master
 
   workflow_dispatch:
-
+  workflow_call:
 
 jobs:
 
   init:
-    name: Install dependencies
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3        
+    name: Init
+    uses: ./.github/workflows/stage-init.yml
+
+  security_sast:
+      name: Sast
+      needs: init
+      uses: ./.github/workflows/stage-sast.yml  
+
+  build_to_hub:
+      name: Build
+      needs: security_sast
+      uses: ./.github/workflows/stage-build.yml 
+      secrets:
+        DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+
+  deploy_to_aws:
+      name: Deploy
+      needs: build_to_hub
+      uses: ./.github/workflows/stage-init.yml   
+
+  notify_telegram:
+      name: Deploy
+      needs: build_to_hub
+      uses: ./.github/workflows/stage-init.yml   
+
+  security_dast:
+      name: Deploy
+      needs: deploy_to_aws
+      uses: ./.github/workflows/stage-init.yml   

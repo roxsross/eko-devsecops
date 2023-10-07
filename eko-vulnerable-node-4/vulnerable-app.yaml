@@ -13,7 +13,7 @@ spec:
     spec:
       containers:
       - name: vulnerable-app
-        image: roxsross12/eko-vulnerable-node-cam4:REPLACE
+        image: roxsross12/eko-vulnerable-node-4:REPLACE
         env:
           - name: STAGE
             value: DOCKER

@@ -1,0 +1,24 @@
+name: Stage Sast
+
+on:
+    workflow_call:
+
+
+jobs:
+
+  check-secret:
+    name: check-secret
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - name: horusec
+      run: docker run --rm -v /var/run/docker.sock:/var/run/docker.sock -v $(pwd):/src public.ecr.aws/roxsross/horusec:v2.9.0 horusec start -p /src -P "$(pwd)" -e="true" -o="json" -O=src/horusec.json || true    
+    - uses: actions/setup-python@v4
+      with:
+        python-version: '3.10' 
+    - run: python ./.github/scripts/roxs-security-tools.py horusec.json horusec 
+      continue-on-error: true      
+    - uses: actions/upload-artifact@v3
+      with:
+        name: horusec
+        path: horusec.json    
