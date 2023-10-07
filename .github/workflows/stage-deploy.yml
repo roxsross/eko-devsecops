@@ -1,0 +1,48 @@
+name: Stage Deploy
+
+on:
+    workflow_call:
+      secrets:
+        AWS_ACCESS_KEY_ID:
+          required: true    
+        AWS_SECRET_ACCESS_KEY:
+          required: true 
+        CLUSTER:
+          required: true 
+env:
+    REPO_NAME: ${{ github.event.repository.name }}
+    REGION: us-east-1
+    NAMESPACE: workshop
+
+jobs:
+
+  deploy_to_aws:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Update manifest kubernetes
+        run: |
+          VERSION=`jq -r '.version' ./package.json`
+          sed -i -- "s/REPLACE/$VERSION/g" $REPO_NAME/vulnerable-app.yaml
+      - uses: actions/upload-artifact@v3
+        with:
+          name: kubernetes
+          path: ${{ env.REPO_NAME }}/vulnerable-app.yaml
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ env.REGION }} 
+      - name: Sts GetCallerIdentity
+        run: aws sts get-caller-identity  
+      - uses: azure/setup-kubectl@v3
+        id: install
+      - name: Update Kubeconfig
+        run: aws eks update-kubeconfig --name ${{ secrets.CLUSTER }} --region ${{ env.REGION }}                 
+      - name: Deploy 
+        run: |
+          cd $REPO_NAME
+          kubectl apply -f . -n ${{ env.NAMESPACE }}      
+      - name: listar pods
+        run: kubectl get pod -n ${{ env.NAMESPACE }}   
