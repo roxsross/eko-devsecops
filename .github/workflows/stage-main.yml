@@ -43,9 +43,11 @@ jobs:
   notify_telegram:
       name: Deploy
       needs: build_to_hub
-      uses: ./.github/workflows/stage-init.yml   
-
+      uses: ./.github/workflows/stage-notify.yml   
+      secrets:
+        TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+        TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
   security_dast:
       name: Deploy
       needs: deploy_to_aws
-      uses: ./.github/workflows/stage-init.yml   
+      uses: ./.github/workflows/stage-dast.yml   

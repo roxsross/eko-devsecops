@@ -1,0 +1,18 @@
+name: Stage Dast
+
+on:
+    workflow_call:
+
+
+jobs:
+
+  check-dast-zap:
+    name: check-dast-zap
+    runs-on: ubuntu-latest
+    steps:
+    - name: Run ZAP - Full Scan
+      run:  docker run --rm -v $(pwd):/zap/wrk/:rw --user root -t ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py -t https://vulnerable.295devops.com -x testreport.xml -r testreport.html || true
+    - uses: actions/upload-artifact@v3
+      with:
+        name: owasp
+        path: testreport.*   
