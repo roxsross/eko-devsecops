@@ -49,7 +49,9 @@ jobs:
           VERSION=`jq -r '.version' ./package.json`
           BOM=`cat bom.xml|base64`
           echo "{ \"projectName\": \"$REPO_NAME\",\"projectVersion\": \"$VERSION\", \"autoCreate\": \"true\", \"bom\": \"$BOM\" }" >bom-payload.json
-          curl -s -X "PUT" "$HOST" \
+          cat @bom-payload.json
+
+          curl -X "PUT" "$HOST" \
               -H "Content-Type: application/json" \
               -H "X-API-Key: $KEY" \
               -d @bom-payload.json            
