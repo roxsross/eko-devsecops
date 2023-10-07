@@ -22,6 +22,9 @@ jobs:
       name: Sast
       needs: init
       uses: ./.github/workflows/stage-sast.yml  
+      secrets:
+        DEPENDENCYTRACK_APIKEY: ${{ secrets.DEPENDENCYTRACK_APIKEY }}
+        DEPENDENCYTRACK_HOST: ${{ secrets.DEPENDENCYTRACK_HOST }}
 
   build_to_hub:
       name: Build
