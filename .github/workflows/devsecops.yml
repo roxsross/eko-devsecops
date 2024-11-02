@@ -18,5 +18,9 @@ jobs:
               run: |
                 echo "scan gitleak"
                 docker run --rm -v "$(pwd):/pwd" zricethezav/gitleaks:latest detect --verbose --source "/pwd" --report-format=sarif --report-path=/pwd/gitleaks-result.sarif --log-level=debug
-                cat gitleaks-result.sarif
               continue-on-error: true 
+            - name: upload report
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                sarif_file: gitleaks-result.sarif
+                category: gitleak
