@@ -46,6 +46,23 @@ jobs:
             with:
               sarif_file: gitleaks-result.sarif
               category: gitleaks    
+    sca:
+        name: SCA Security Scan
+        needs: secret
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+            - name: Run Snyk to check for vulnerabilities
+              uses: snyk/actions/node@master
+              env:
+                SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}    
+              with:
+                args: --severity-threshold=high --sarif-file-output=snyk-results.sarif
+            - name: Upload Snkyk Results
+              uses: github/codeql-action/upload-sarif@v3
+              with:
+                sarif_file: snyk-results.sarif
+                category: snyk                                          
     trivy:
         name: Container Security Scan
         needs: secret
