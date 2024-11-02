@@ -19,6 +19,15 @@ jobs:
                 echo "scan gitleak"
                 docker run --rm -v "$(pwd):/pwd" zricethezav/gitleaks:latest detect --verbose --source "/pwd" --report-format=sarif --report-path=/pwd/gitleaks-result.sarif --log-level=debug
               continue-on-error: true 
+            - name: Setup Python
+              uses: actions/setup-python@v4
+              with:
+                python-version: '3.13' 
+            - name: remove items duplicados
+              run: |
+                mv gitleaks-result.sarif /tmp/gitleaks-result.sarif
+                python .github/scripts/remove.py /tmp/gitleaks-result.sarif
+                mv /tmp/gitleaks-result.sarif gitleaks-result.sarif 
             - name: upload report
               uses: github/codeql-action/upload-sarif@v3
               with:
