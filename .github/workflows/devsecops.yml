@@ -17,6 +17,6 @@ jobs:
             - name: scan gitleaks
               run: |
                 echo "scan gitleak"
-                docker run --rm -v "$(pwd):/pwd" zricethezav/gitleaks:latest detect --versbose --source "/pwd" --report-format=sarif --report-path=/pwd/gitleaks-result.sarif --log-level=debug
+                docker run --rm -v "$(pwd):/pwd" zricethezav/gitleaks:latest detect --verbose --source "/pwd" --report-format=sarif --report-path=/pwd/gitleaks-result.sarif --log-level=debug
                 cat gitleaks-result.sarif
               continue-on-error: true 
