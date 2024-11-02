@@ -1,4 +1,4 @@
-FROM node:19.4.0-bullseye-slim
+FROM node:19-alpine
 
 LABEL org.opencontainers.image.description="vulnerable-node" \
       org.opencontainers.image.authors="RoxsRoss" 
