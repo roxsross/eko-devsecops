@@ -17,30 +17,35 @@ jobs:
         name: Secret Security Scan
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v4
-              with:
-                fetch-depth: '0' #historia git
-            - name: scan gitleaks
-              run: |
-                echo "scan gitleak"
-                docker run --rm -v "$(pwd):/pwd" zricethezav/gitleaks:latest detect --verbose --source "/pwd" --report-format=sarif --report-path=/pwd/gitleaks-result.sarif --log-level=debug
-              continue-on-error: true 
-            - name: Setup Python
-              uses: actions/setup-python@v4
-              with:
-                python-version: '3.13' 
-            - name: remove items duplicados
-              run: |
-                mv gitleaks-result.sarif /tmp/gitleaks-result.sarif
-                python .github/scripts/remove.py /tmp/gitleaks-result.sarif
-                mv /tmp/gitleaks-result.sarif gitleaks-result.sarif 
-              continue-on-error: true 
-            - name: upload report
-              uses: github/codeql-action/upload-sarif@v3
-              with:
-                sarif_file: gitleaks-result.sarif
-                category: gitleak
-              continue-on-error: true 
+          - name: Checkout repository
+            uses: actions/checkout@v4
+          - name: Scan with Gitleaks
+            run: |
+              docker run --rm \
+                -v "$(pwd):/pwd" \
+                zricethezav/gitleaks:latest \
+                detect \
+                --verbose \
+                --source="/pwd" \
+                --report-format=sarif \
+                --report-path=/pwd/gitleaks-result.sarif \
+                --log-level=debug \
+                --config=/pwd/.gitleaks.toml
+            continue-on-error: true
+          - name: Setup Python
+            uses: actions/setup-python@v4
+            with:
+              python-version: '3.13'            
+          - name: Remove duplicate rules from SARIF
+            run: | 
+              mv gitleaks-result.sarif /tmp/gitleaks-result.sarif
+              python .github/scripts/remove.py /tmp/gitleaks-result.sarif 
+              mv /tmp/gitleaks-result.sarif gitleaks-result.sarif   
+          - name: Upload Gitleaks Results
+            uses: github/codeql-action/upload-sarif@v3
+            with:
+              sarif_file: gitleaks-result.sarif
+              category: gitleaks    
     trivy:
         name: Container Security Scan
         needs: secret
