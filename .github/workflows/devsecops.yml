@@ -7,8 +7,16 @@ on:
             - develop
 
 jobs:
-    init:
+    secret:
+        name: Secret Security Scan
         runs-on: ubuntu-latest
         steps:
-            - name: Prueba step 
-              run: echo "hola mundo"
+            - uses: actions/checkout@v4
+              with:
+                fetch-depth: '0' #historia git
+            - name: scan gitleaks
+              run: |
+                echo "scan gitleak"
+                docker run --rm -v "$(pwd):/pwd" zricethezav/gitleaks:latest detect --versbose --source "/pwd" --report-format=sarif --report-path=/pwd/gitleaks-result.sarif --log-level=debug
+                cat gitleaks-result.sarif
+              continue-on-error: true 
