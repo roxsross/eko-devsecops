@@ -53,6 +53,7 @@ jobs:
       - name: Remove duplicate rules from SARIF
         run: | 
           mv gitleaks-result.sarif /tmp/gitleaks-result.sarif
+          chmod 666 /tmp/gitleaks-result.sarif
           python .github/scripts/remove.py /tmp/gitleaks-result.sarif 
           mv /tmp/gitleaks-result.sarif gitleaks-result.sarif   
       - name: Upload Gitleaks Results
