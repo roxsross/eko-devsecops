@@ -45,7 +45,8 @@ jobs:
             uses: github/codeql-action/upload-sarif@v3
             with:
               sarif_file: gitleaks-result.sarif
-              category: gitleaks    
+              category: gitleaks  
+            continue-on-error: true  
     sca:
         name: SCA Security Scan
         needs: secret
