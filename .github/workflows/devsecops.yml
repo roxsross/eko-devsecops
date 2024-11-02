@@ -44,7 +44,7 @@ jobs:
               with:
                 fetch-depth: '0' #historia git
             - name: build images
-              run: docker build -t app-images:${{ github.sha }} .
+              run: docker build -t app-image:${{ github.sha }} .
 
             - name: Run Trivy vulnerability scanner
               uses: aquasecurity/trivy-action@master
