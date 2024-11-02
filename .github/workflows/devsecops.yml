@@ -1,0 +1,14 @@
+name: eko-devsecops-cicd
+
+#evento
+on:
+    push:
+        branches:
+            - develop
+
+jobs:
+    init:
+        runs-on: ubuntu-latest
+        steps:
+            - name: Prueba step 
+              run: echo "hola mundo"
