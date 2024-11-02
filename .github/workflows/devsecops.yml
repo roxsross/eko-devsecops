@@ -34,6 +34,7 @@ jobs:
               with:
                 sarif_file: gitleaks-result.sarif
                 category: gitleak
+              continue-on-error: true 
     trivy:
         name: Container Security Scan
         needs: secret
