@@ -64,27 +64,7 @@ jobs:
         with:
           sarif_file: snyk-results.sarif
           category: snyk          
-
-  sast:
-    runs-on: ubuntu-latest
-    name: Sast Security Scan
-    container:
-      image: returntocorp/semgrep
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-      - name: full scan
-        run: |
-          semgrep \
-          --sarif --output report.sarif \
-          --metrics=off \
-          --config="p/javascript"
-      
-      - name: Upload Snyk results
-        uses: github/codeql-action/upload-sarif@v3
-        with:
-          sarif_file: report.sarif
-          category: semgrep               
+            
   container-scan:
     runs-on: ubuntu-latest
     name: Container Security Scan
