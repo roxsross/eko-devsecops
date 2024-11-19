@@ -27,8 +27,8 @@ jobs:
             detect \
             --verbose \
             --source="/pwd" \
-            --report-format=sarif \
-            --report-path=/pwd/gitleaks-result.sarif \
+            --report-format=json \
+            --report-path=/pwd/gitleaks-result.json \
             --log-level=debug \
             --config=/pwd/.gitleaks.toml
         continue-on-error: true
@@ -36,15 +36,11 @@ jobs:
         uses: actions/setup-python@v4
         with:
           python-version: '3.13'            
-      - name: Remove duplicate rules from SARIF
-        run: | 
-            python .github/scripts/remove.py gitleaks-result.sarif gitleaks-result-cleaned.sarif
-            mv gitleaks-result-cleaned.sarif gitleaks-result.sarif
-      - name: Upload Gitleaks Results
-        uses: github/codeql-action/upload-sarif@v3
+      - uses: actions/upload-artifact@v4
         with:
-          sarif_file: gitleaks-result.sarif
-          category: gitleaks       
+          name: gitleaks
+          path: gitleaks-result.json
+  
   sca:
     runs-on: ubuntu-latest
     name: Sca Security Scan
@@ -56,14 +52,12 @@ jobs:
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
-          args: --severity-threshold=high --sarif-file-output=snyk-results.sarif
+          args: --severity-threshold=high --sarif-file-output=snyk-results.json
         continue-on-error: true
-
-      - name: Upload Snyk results
-        uses: github/codeql-action/upload-sarif@v3
+      - uses: actions/upload-artifact@v4
         with:
-          sarif_file: snyk-results.sarif
-          category: snyk          
+          name: snyk
+          path: snyk-results.json
             
   container-scan:
     runs-on: ubuntu-latest
@@ -81,12 +75,10 @@ jobs:
           TRIVY_DB_REPOSITORY: ghcr.io/aquasecurity/trivy-db,public.ecr.aws/aquasecurity/trivy-db
         with:
           image-ref: 'app-image:${{ github.sha }}'
-          format: 'sarif'
-          output: 'trivy-results.sarif'
+          format: 'json'
+          output: 'trivy-results.json'
           severity: 'CRITICAL,HIGH'
-
-      - name: Upload Trivy results
-        uses: github/codeql-action/upload-sarif@v3
+      - uses: actions/upload-artifact@v4
         with:
-          sarif_file: 'trivy-results.sarif'
-          category: trivy
+          name: trivy
+          path: trivy-results.json
