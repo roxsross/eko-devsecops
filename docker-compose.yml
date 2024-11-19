@@ -2,15 +2,17 @@ version: '3.9'
 services:
   vulnerable_node:
     restart: always
-    build: .
+    image: roxsross12/eko-devsecops
     depends_on:
       - db
+    environment:
+      - STAGE=DOCKER
     ports:
       - "3000:3000"
 
   db:
     restart: always
-    build: ./services/postgresql
+    image: roxsross12/test-postgres-devsecops
     ports:
       - "5432:5432"
     environment:

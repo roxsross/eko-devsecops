@@ -128,3 +128,29 @@ jobs:
           tags: |
              ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:latest,
              ${{ env.REGISTRY }}/${{ env.REPOSITORY }}:${{ github.sha }}
+  deploy:
+    runs-on: ubuntu-latest
+    name: deploy
+    needs: [build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: copy file via ssh password
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.AWS_IP_EC2 }}
+          username: ${{ secrets.AWS_USER_EC2 }}
+          key: ${{ secrets.AWS_TOKEN_EC2 }}
+          port: ${{ secrets.AWS_PORT_EC2 }}
+          source: "docker-compose.yml"
+          target: "~/app"
+      - name: executing remote ssh commands using password
+        uses: appleboy/ssh-action@v1.2.0
+        with:
+          host: ${{ secrets.AWS_IP_EC2 }}
+          username: ${{ secrets.AWS_USER_EC2 }}
+          key: ${{ secrets.AWS_TOKEN_EC2 }}
+          port: ${{ secrets.AWS_PORT_EC2 }}
+          script: |
+            cd ~/app
+            docker-compose up -d
