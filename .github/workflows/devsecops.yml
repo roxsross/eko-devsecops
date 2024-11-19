@@ -28,7 +28,7 @@ jobs:
             --verbose \
             --source="/pwd" \
             --report-format=json \
-            --report-path=/pwd/gitleaks-result.json \
+            --report-path=/pwd/gitleaks-results.json \
             --log-level=debug \
             --config=/pwd/.gitleaks.toml
         continue-on-error: true
@@ -39,7 +39,11 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: gitleaks
-          path: gitleaks-result.json
+          path: gitleaks-results.json
+      - name: upload defectDojo
+        run: | 
+          pip install requests
+          python .github/scripts/upload-reports.py gitleaks-results.json
   
   sca:
     runs-on: ubuntu-latest
