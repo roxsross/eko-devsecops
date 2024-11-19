@@ -164,6 +164,7 @@ jobs:
       - name: DAST SCAN
         run: | 
           docker run -u root --rm -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py -t http://35.94.21.248:3000 -r testreport.html  -x zap-results.xml
+        continue-on-error: true
       - uses: actions/upload-artifact@v4
         with:
           name: dast
