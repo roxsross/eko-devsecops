@@ -154,3 +154,25 @@ jobs:
           script: |
             cd ~/app
             docker-compose up -d
+  dast:
+    runs-on: ubuntu-latest
+    name: dast security
+    needs: [deploy]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      - name: DAST SCAN
+        run: | 
+          docker run -u root --rm -v $(pwd):/zap/wrk/:rw -t ghcr.io/zaproxy/zaproxy:stable zap-full-scan.py -t http://35.94.21.248:3000 -r testreport.html  -x zap-results.xml
+      - uses: actions/upload-artifact@v4
+        with:
+          name: dast
+          path: zap-results.xml
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'    
+      - name: upload defectDojo
+        run: | 
+          pip install requests
+          python .github/scripts/upload-reports.py zap-results.xml
