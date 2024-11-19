@@ -12,6 +12,9 @@ permissions:
   checks: write
   pull-requests: write
 
+env:
+  DEFECTDOJO_TOKEN: ${{ secrets.DEFECTDOJO_TOKEN }}
+
 jobs:
   secrets:
     name: Secrets Security Scan
