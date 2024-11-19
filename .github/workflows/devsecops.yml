@@ -65,7 +65,14 @@ jobs:
         with:
           name: snyk
           path: snyk-results.json
-            
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'    
+      - name: upload defectDojo
+        run: | 
+          pip install requests
+          python .github/scripts/upload-reports.py snyk-results.json     
   container-scan:
     runs-on: ubuntu-latest
     name: Container Security Scan
@@ -89,3 +96,11 @@ jobs:
         with:
           name: trivy
           path: trivy-results.json
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.13'    
+      - name: upload defectDojo
+        run: | 
+          pip install requests
+          python .github/scripts/upload-reports.py trivy-results.json    
